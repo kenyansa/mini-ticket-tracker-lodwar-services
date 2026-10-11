@@ -1,10 +1,12 @@
-import { pool } from "../db";
+import { pool } from '../db';
 import type {
   CreateTicketInput,
   Priority,
   Status,
   ListTicketsQuery,
-} from "../validation/tickets.schemas";
+  UpdateTicketInput,
+  TicketIdParams,
+} from '../validation/tickets.schemas';
 
 export interface Ticket {
   id: number;
@@ -42,7 +44,7 @@ export async function findAll(
   const offset = (page - 1) * limit;
 
   const filterParams: unknown[] = status ? [status] : [];
-  const where = status ? "WHERE status = $1::ticket_status" : "";
+  const where = status ? 'WHERE status = $1::ticket_status' : '';
   const n = filterParams.length;
 
   const countResult = await pool.query<{ total: number }>(
@@ -60,4 +62,23 @@ export async function findAll(
   );
 
   return { items: listResult.rows, total: countResult.rows[0].total };
+}
+
+export async function update(id: number, input: UpdateTicketInput): Promise<Ticket | null> {
+  const { rows } = await pool.query<Ticket>(
+    `UPDATE tickets
+     SET status   = COALESCE($2::ticket_status, status),
+         priority = COALESCE($3::ticket_priority, priority)
+     WHERE id = $1
+     RETURNING ${COLUMNS}`,
+    [id, input.status ?? null, input.priority ?? null]
+  );
+  return rows[0] ?? null;
+}
+
+export async function countByStatus(): Promise<{ status: Status; count: number }[]> {
+  const { rows } = await pool.query<{ status: Status; count: number }>(
+    `SELECT status, COUNT(*)::int AS count FROM tickets GROUP BY status`
+  );
+  return rows;
 }

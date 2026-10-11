@@ -1,6 +1,6 @@
-import type { RequestHandler } from "express";
-import type { ZodType } from "zod";
-import { HttpError } from "./errorHandler";
+import type { RequestHandler } from 'express';
+import type { ZodType } from 'zod';
+import { HttpError } from './errorHandler';
 
 export const validateBody =
   (schema: ZodType): RequestHandler =>
@@ -8,10 +8,10 @@ export const validateBody =
     const result = schema.safeParse(req.body);
     if (!result.success) {
       const details = result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
+        field: issue.path.join('.'),
         message: issue.message,
       }));
-      return next(new HttpError(400, "Validation failed", details));
+      return next(new HttpError(400, 'Validation failed', details));
     }
     req.body = result.data; // replace with the parsed, trimmed version
     next();
@@ -23,11 +23,26 @@ export const validateQuery =
     const result = schema.safeParse(req.query);
     if (!result.success) {
       const details = result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
+        field: issue.path.join('.'),
         message: issue.message,
       }));
-      return next(new HttpError(400, "Invalid query parameters", details));
+      return next(new HttpError(400, 'Invalid query parameters', details));
     }
     res.locals.query = result.data;
+    next();
+  };
+
+export const validateParams =
+  (schema: ZodType): RequestHandler =>
+  (req, res, next) => {
+    const result = schema.safeParse(req.params);
+    if (!result.success) {
+      const details = result.error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      }));
+      return next(new HttpError(400, 'Invalid ticket id', details));
+    }
+    res.locals.params = result.data;
     next();
   };

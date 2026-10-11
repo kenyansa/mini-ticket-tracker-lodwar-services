@@ -24,8 +24,8 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     return;
   }
 
-  if (err?.type === "entity.parse.failed") {
-    res.status(400).json({ error: { message: "Malformed JSON body" } });
+  if (err?.type === 'entity.parse.failed') {
+    res.status(400).json({ error: { message: 'Malformed JSON body' } });
     return;
   }
 

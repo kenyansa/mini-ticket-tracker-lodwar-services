@@ -22,7 +22,22 @@ export const listTicketsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 
+export const updateTicketSchema = z
+  .strictObject({
+    status: statusSchema.optional(),
+    priority: prioritySchema.optional(),
+  })
+  .refine((data) => data.status !== undefined || data.priority !== undefined, {
+    message: "Provide at least one of: status, priority",
+  });
+
+export const ticketIdParamsSchema = z.object({
+  id: z.coerce.number().int().positive().max(2147483647),
+});
+
 export type Status = z.infer<typeof statusSchema>;
 export type Priority = z.infer<typeof prioritySchema>;
 export type CreateTicketInput = z.infer<typeof createTicketSchema>;
 export type ListTicketsQuery = z.infer<typeof listTicketsQuerySchema>;
+export type UpdateTicketInput = z.infer<typeof updateTicketSchema>;
+export type TicketIdParams = z.infer<typeof ticketIdParamsSchema>;
