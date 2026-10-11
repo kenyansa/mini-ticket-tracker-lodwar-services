@@ -1,0 +1,1 @@
+CREATE DATABASE ticket_tracker_test;
