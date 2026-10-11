@@ -4,23 +4,20 @@ import { TicketRow } from './TicketRow';
 interface Props {
   tickets: Ticket[];
   loading: boolean;
+  onChanged: () => void;
 }
 
-export function TicketList({ tickets, loading }: Props) {
+export function TicketList({ tickets, loading, onChanged }: Props) {
   if (loading && tickets.length === 0) {
-    return <p className="p-6 text-center text-gray-500">Loading…</p>;
+    return <p className="empty-state">Loading tickets…</p>;
   }
   if (tickets.length === 0) {
-    return <p className="p-6 text-center text-gray-500">No tickets found.</p>;
+    return <p className="empty-state">No tickets found.</p>;
   }
   return (
-    <ul
-      className={`divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white ${
-        loading ? 'opacity-60' : ''
-      }`}
-    >
+    <ul className={`ticket-list${loading ? ' is-loading' : ''}`}>
       {tickets.map((t) => (
-        <TicketRow key={t.id} ticket={t} />
+        <TicketRow key={t.id} ticket={t} onChanged={onChanged} />
       ))}
     </ul>
   );

@@ -10,7 +10,7 @@ const OPTIONS: (Status | undefined)[] = [undefined, 'open', 'in_progress', 'clos
 
 export function StatusFilter({ value, onChange }: Props) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="status-filter" role="group" aria-label="Filter tickets by status">
       {OPTIONS.map((opt) => {
         const active = opt === value;
         return (
@@ -18,11 +18,8 @@ export function StatusFilter({ value, onChange }: Props) {
             key={opt ?? 'all'}
             type="button"
             onClick={() => onChange(opt)}
-            className={`rounded-full border px-3 py-1 text-sm ${
-              active
-                ? 'border-indigo-600 bg-indigo-600 text-white'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-            }`}
+            aria-pressed={active}
+            className={`status-filter-button${active ? ' is-active' : ''}`}
           >
             {opt ? STATUS_LABELS[opt] : 'All'}
           </button>
