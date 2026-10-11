@@ -3,6 +3,7 @@ import type {
   CreateTicketInput,
   Priority,
   Status,
+  ListTicketsQuery,
 } from "../validation/tickets.schemas";
 
 export interface Ticket {
@@ -32,4 +33,31 @@ export async function insert(input: CreateTicketInput): Promise<Ticket> {
     [input.title, input.description ?? null, input.priority ?? null]
   );
   return rows[0];
+}
+
+export async function findAll(
+  query: ListTicketsQuery
+): Promise<{ items: Ticket[]; total: number }> {
+  const { status, page, limit } = query;
+  const offset = (page - 1) * limit;
+
+  const filterParams: unknown[] = status ? [status] : [];
+  const where = status ? "WHERE status = $1::ticket_status" : "";
+  const n = filterParams.length;
+
+  const countResult = await pool.query<{ total: number }>(
+    `SELECT COUNT(*)::int AS total FROM tickets ${where}`,
+    filterParams
+  );
+
+  const listResult = await pool.query<Ticket>(
+    `SELECT ${COLUMNS}
+     FROM tickets
+     ${where}
+     ORDER BY created_at DESC, id DESC
+     LIMIT $${n + 1} OFFSET $${n + 2}`,
+    [...filterParams, limit, offset]
+  );
+
+  return { items: listResult.rows, total: countResult.rows[0].total };
 }

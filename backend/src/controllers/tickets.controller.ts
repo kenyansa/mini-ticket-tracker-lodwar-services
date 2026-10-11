@@ -5,3 +5,8 @@ export const create: RequestHandler = async (req, res) => {
   const ticket = await ticketsService.createTicket(req.body);
   res.status(201).json(ticket);
 };
+
+export const list: RequestHandler = async (_req, res) => {
+  const result = await ticketsService.listTickets(res.locals.query);
+  res.json(result);
+};
