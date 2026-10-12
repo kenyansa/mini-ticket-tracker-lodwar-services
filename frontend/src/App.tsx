@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Pagination } from './components/Pagination';
 import { StatsBar } from './components/StatsBar';
 import { StatusFilter } from './components/StatusFilter';
@@ -7,6 +8,18 @@ import { useTickets } from './hooks/useTickets';
 
 export default function App() {
   const { status, setStatus, setPage, result, stats, loading, error, refetch } = useTickets();
+  const [statusUpdateSuccess, setStatusUpdateSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!statusUpdateSuccess) return;
+    const timeoutId = window.setTimeout(() => setStatusUpdateSuccess(false), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [statusUpdateSuccess]);
+
+  function handleStatusUpdated() {
+    setStatusUpdateSuccess(true);
+    refetch();
+  }
 
   return (
     <main className="app-shell">
@@ -34,7 +47,17 @@ export default function App() {
           <StatusFilter value={status} onChange={setStatus} />
         </div>
 
-        <TicketList tickets={result?.data ?? []} loading={loading} onChanged={refetch} />
+        {statusUpdateSuccess && (
+          <p role="status" className="status-success">
+            Ticket status updated successfully.
+          </p>
+        )}
+
+        <TicketList
+          tickets={result?.data ?? []}
+          loading={loading}
+          onChanged={handleStatusUpdated}
+        />
 
         {result && (
           <Pagination

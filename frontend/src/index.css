@@ -174,18 +174,49 @@ button:disabled {
     box-shadow 140ms ease;
 }
 
-textarea.form-control {
-  min-height: 96px;
+.description-control {
+  width: 100%;
+  min-height: 112px;
+  padding: 13px 14px;
+  border: 1px solid #d9ddd3;
+  border-radius: 10px;
+  outline: none;
+  background: #fbfcf9;
+  color: var(--color-ink);
+  font-size: 0.925rem;
+  line-height: 1.55;
   resize: vertical;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
 }
 
-.form-control::placeholder {
+.form-control::placeholder,
+.description-control::placeholder {
   color: #a0a49c;
 }
 
-.form-control:focus {
+.form-control:focus,
+.description-control:focus {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgb(49 93 69 / 13%);
+}
+
+.description-control:focus {
+  background: #fff;
+}
+
+.form-control option,
+.ticket-status-select option {
+  background: #fff;
+  color: var(--color-ink);
+}
+
+.form-control option:checked,
+.ticket-status-select option:checked {
+  background: #dbeafe;
+  color: #1e3a8a;
 }
 
 .form-actions {
@@ -197,9 +228,9 @@ textarea.form-control {
 .primary-button,
 .secondary-button {
   min-height: 42px;
-  padding: 0 16px;
+  padding: 0 18px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   transition:
@@ -278,7 +309,7 @@ textarea.form-control {
   min-height: 34px;
   padding: 0 11px;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: 999px;
   background: transparent;
   color: #62685f;
   font-size: 0.82rem;
@@ -359,11 +390,16 @@ textarea.form-control {
   min-height: 32px;
   padding: 4px 8px;
   border: 1px solid var(--color-border);
-  border-radius: 7px;
+  border-radius: 9px;
   outline: none;
   background: white;
   color: #4b5148;
   font-size: 0.78rem;
+}
+
+.form-control:where(select),
+.ticket-status-select {
+  color-scheme: light;
 }
 
 .ticket-status-select:focus-visible {
@@ -449,6 +485,16 @@ textarea.form-control {
 .error-message {
   color: #a33f35;
   font-size: 0.82rem;
+}
+
+.status-success {
+  margin: 0;
+  padding: 11px 22px;
+  border-bottom: 1px solid #d6e6d7;
+  background: #f0f7ef;
+  color: #386444;
+  font-size: 0.84rem;
+  font-weight: 550;
 }
 
 .page-error {

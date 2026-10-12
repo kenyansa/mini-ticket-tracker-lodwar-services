@@ -44,10 +44,7 @@ export function TicketForm({ onCreated }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="ticket-form"
-    >
+    <form onSubmit={handleSubmit} className="ticket-form">
       <h2 className="form-heading">Create a ticket</h2>
 
       <div className="form-grid">
@@ -70,7 +67,7 @@ export function TicketForm({ onCreated }: Props) {
           <textarea
             id="description"
             rows={3}
-            className="form-control"
+            className="description-control"
             value={description}
             placeholder="Add any useful context..."
             onChange={(e) => setDescription(e.target.value)}
