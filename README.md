@@ -6,7 +6,7 @@ A small support-ticket tracker: a REST API, a PostgreSQL database and a single-p
 
 - **Backend:** Node.js, Express 5, TypeScript, PostgreSQL (`pg`), Zod, Vitest and Supertest
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS v4
-- **Infrastructure:** Docker Compose (optional)
+- **Infrastructure:** Docker Compose
 
 ## Features
 
@@ -22,7 +22,7 @@ A small support-ticket tracker: a REST API, a PostgreSQL database and a single-p
 mini-ticket-tracker/
 ├── README.md
 ├── docker-compose.yml
-├── docker/initdb/01-create-test-db.sql   # creates the test DB on first Docker start
+├── docker/initdb/01-create-test-db.sql  
 │
 ├── backend/
 │   ├── Dockerfile
@@ -80,8 +80,8 @@ You can also create them in pgAdmin (right-click **Databases → Create → Data
 ```bash
 cd backend
 npm install
-cp .env.example .env     # then edit .env with your Postgres user and password
-npm run migrate          # applies db/schema.sql to both databases
+cp .env.example .env     
+npm run migrate        
 npm run dev              # API on http://localhost:3000
 ```
 
@@ -102,8 +102,6 @@ Open http://localhost:5173. The Vite dev server proxies `/api/*` to the backend 
 | `PORT`              | API port                                 | `3000`                                                                 |
 | `DATABASE_URL`      | Development database                     | `postgres://postgres:your_password@localhost:5432/ticket_tracker`      |
 | `TEST_DATABASE_URL` | Test database, used when `NODE_ENV=test` | `postgres://postgres:your_password@localhost:5432/ticket_tracker_test` |
-
-`.env` is gitignored. If your password contains special characters, URL-encode them (`@` becomes `%40`, `#` becomes `%23`). Never point `TEST_DATABASE_URL` at your development database, because the tests truncate the table.
 
 ## Setup (Docker)
 
@@ -265,7 +263,14 @@ Indexes: `(status)` for the filter and stats, and `(created_at DESC, id DESC)` f
 
 ## Decisions & Tradeoffs
 
-I used a layered backend (route, validation, controller, service, repository) to keep HTTP handling, business rules and SQL separate, even though the service layer is thin at this size. SQL is written with raw `pg` and parameterised queries instead of an ORM, and the schema is applied by a small idempotent script rather than a migration tool, so there is no migration history or rollback. Pagination is offset-based with a stable `created_at, id` ordering, and a page past the end returns an empty list rather than an error; cursor pagination would scale better on large tables. The frontend refetches the list and stats after every change instead of using optimistic updates or React Query, which is simple and always correct but costs an extra request. Types are duplicated between frontend and backend, and with more time I would share them or generate them from an OpenAPI spec. There is no authentication, no editing or deletion beyond what the brief required, and styling is minimal Tailwind. `HttpError` lives in `middleware/`, which is a small layering compromise, and I would move it to a neutral module. The Docker setup runs production builds with no hot reload and uses throwaway local credentials, so it is for evaluation rather than deployment. With more time I would add frontend tests, CI that runs the test suite, and a proper migration tool.
+- I used a layered backend (route, validation, controller, service, repository) to keep HTTP handling, business rules and SQL separate, even though the service layer is thin at this size. 
+- SQL is written with raw `pg` and parameterised queries instead of an ORM, and the schema is applied by a small idempotent script rather than a migration tool, so there is no migration history or rollback. 
+- Pagination is offset-based with a stable `created_at, id` ordering, and a page past the end returns an empty list rather than an error; cursor pagination would scale better on large tables. 
+- The frontend refetches the list and stats after every change instead of using optimistic updates or React Query, which is simple and always correct but costs an extra request. 
+- Types are duplicated between frontend and backend, and with more time I would share them or generate them from an OpenAPI spec. 
+- There is no authentication, no editing or deletion beyond what the brief required, and styling is minimal Tailwind. 
+- `HttpError` lives in `middleware/`, which is a small layering compromise, and I would move it to a neutral module. 
+- The Docker setup runs production builds with no hot reload and uses throwaway local credentials, so it is for evaluation rather than deployment. With more time I would add frontend tests, CI that runs the test suite, and a proper migration tool.
 
 ### Assumptions
 

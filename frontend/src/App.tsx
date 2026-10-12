@@ -11,7 +11,7 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="page-header">
-        <p className="eyebrow">Workspace</p>
+        <p className="eyebrow">Workspace | Lodwar Services</p>
         <h1 className="page-title">Mini Ticket Tracker</h1>
         <p className="page-description">Keep work moving. Track every request in one place.</p>
       </header>

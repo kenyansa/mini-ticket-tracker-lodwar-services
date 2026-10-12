@@ -13,7 +13,7 @@ export const validateBody =
       }));
       return next(new HttpError(400, 'Validation failed', details));
     }
-    req.body = result.data; // replace with the parsed, trimmed version
+    req.body = result.data;
     next();
   };
 
