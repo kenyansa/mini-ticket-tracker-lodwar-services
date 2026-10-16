@@ -1,9 +1,15 @@
-import request from 'supertest';
-import { describe, expect, it } from 'vitest';
-import { app } from '../src/app';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { loginAs } from './helpers';
+
+let agent: Awaited<ReturnType<typeof loginAs>>['agent'];
+
+// runs after the setup file's truncate, so each test gets a fresh admin session
+beforeEach(async () => {
+  ({ agent } = await loginAs('admin'));
+});
 
 async function createTicket(body: Record<string, unknown>) {
-  return request(app).post('/tickets').send(body);
+  return agent.post('/tickets').send(body);
 }
 
 describe('POST /tickets', () => {
@@ -17,7 +23,9 @@ describe('POST /tickets', () => {
       description: null,
       status: 'open',
       priority: 'medium',
+      assigneeId: null,
     });
+    expect(res.body.createdBy).toBeTruthy();
     expect(res.body.createdAt).toBeTruthy();
   });
 
@@ -29,17 +37,14 @@ describe('POST /tickets', () => {
   });
 
   it('rejects an invalid priority and unknown fields', async () => {
-    const res = await createTicket({ title: 'x', priority: 'urgent' });
-    expect(res.status).toBe(400);
-
-    const res2 = await createTicket({ title: 'x', status: 'closed' });
-    expect(res2.status).toBe(400);
+    expect((await createTicket({ title: 'x', priority: 'urgent' })).status).toBe(400);
+    expect((await createTicket({ title: 'x', status: 'closed' })).status).toBe(400);
   });
 });
 
 describe('GET /tickets/stats', () => {
   it('returns zero counts for an empty table', async () => {
-    const res = await request(app).get('/tickets/stats');
+    const res = await agent.get('/tickets/stats');
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ open: 0, in_progress: 0, closed: 0 });
@@ -49,9 +54,9 @@ describe('GET /tickets/stats', () => {
     await createTicket({ title: 'a' });
     await createTicket({ title: 'b' });
     const third = await createTicket({ title: 'c' });
-    await request(app).patch(`/tickets/${third.body.id}`).send({ status: 'in_progress' });
+    await agent.patch(`/tickets/${third.body.id}`).send({ status: 'in_progress' });
 
-    const res = await request(app).get('/tickets/stats');
+    const res = await agent.get('/tickets/stats');
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ open: 2, in_progress: 1, closed: 0 });
@@ -64,33 +69,28 @@ describe('GET /tickets', () => {
       await createTicket({ title });
     }
 
-    const page1 = await request(app).get('/tickets?limit=2&page=1');
+    const page1 = await agent.get('/tickets?limit=2&page=1');
     expect(page1.status).toBe(200);
     expect(page1.body.data.map((t: { title: string }) => t.title)).toEqual(['three', 'two']);
-    expect(page1.body).toMatchObject({
-      page: 1,
-      limit: 2,
-      total: 3,
-      totalPages: 2,
-    });
+    expect(page1.body).toMatchObject({ page: 1, limit: 2, total: 3, totalPages: 2 });
 
-    const page2 = await request(app).get('/tickets?limit=2&page=2');
+    const page2 = await agent.get('/tickets?limit=2&page=2');
     expect(page2.body.data.map((t: { title: string }) => t.title)).toEqual(['one']);
   });
 
   it('filters by status', async () => {
     await createTicket({ title: 'a' });
     const b = await createTicket({ title: 'b' });
-    await request(app).patch(`/tickets/${b.body.id}`).send({ status: 'closed' });
+    await agent.patch(`/tickets/${b.body.id}`).send({ status: 'closed' });
 
-    const res = await request(app).get('/tickets?status=closed');
+    const res = await agent.get('/tickets?status=closed');
 
     expect(res.body.total).toBe(1);
     expect(res.body.data[0].title).toBe('b');
   });
 
   it('rejects an invalid status filter', async () => {
-    const res = await request(app).get('/tickets?status=banana');
+    const res = await agent.get('/tickets?status=banana');
     expect(res.status).toBe(400);
   });
 });
@@ -99,7 +99,7 @@ describe('PATCH /tickets/:id', () => {
   it('updates status and priority', async () => {
     const created = await createTicket({ title: 'a' });
 
-    const res = await request(app)
+    const res = await agent
       .patch(`/tickets/${created.body.id}`)
       .send({ status: 'in_progress', priority: 'high' });
 
@@ -108,7 +108,7 @@ describe('PATCH /tickets/:id', () => {
   });
 
   it('returns 404 for an unknown id', async () => {
-    const res = await request(app).patch('/tickets/9999').send({ status: 'closed' });
+    const res = await agent.patch('/tickets/9999').send({ status: 'closed' });
     expect(res.status).toBe(404);
   });
 
@@ -116,8 +116,8 @@ describe('PATCH /tickets/:id', () => {
     const created = await createTicket({ title: 'a' });
     const url = `/tickets/${created.body.id}`;
 
-    expect((await request(app).patch(url).send({ status: 'done' })).status).toBe(400);
-    expect((await request(app).patch(url).send({})).status).toBe(400);
-    expect((await request(app).patch(url).send({ title: 'hacked' })).status).toBe(400);
+    expect((await agent.patch(url).send({ status: 'done' })).status).toBe(400);
+    expect((await agent.patch(url).send({})).status).toBe(400);
+    expect((await agent.patch(url).send({ title: 'hacked' })).status).toBe(400);
   });
 });
