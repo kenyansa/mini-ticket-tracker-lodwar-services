@@ -7,10 +7,17 @@ import {
   ticketIdParamsSchema,
   updateTicketSchema,
 } from '../validation/tickets.schemas';
+import { requireAuth, requirePermission } from '../middleware/auth';
 
 const router = Router();
+router.use(requireAuth);
 
-router.post('/', validateBody(createTicketSchema), ticketsController.create);
+router.post(
+  '/',
+  requirePermission('ticket:create'),
+  validateBody(createTicketSchema),
+  ticketsController.create
+);
 router.get('/', validateQuery(listTicketsQuerySchema), ticketsController.list);
 router.get('/stats', ticketsController.stats);
 
