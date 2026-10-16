@@ -129,6 +129,8 @@ docker compose down -v
 
 The Docker setup runs production builds, so there is no hot reload. Use the local setup while developing.
 
+Sign in with the seeded admin: `admin@example.com` / `ChangeMe123!` (local use only, set in `docker-compose.yml`).
+
 ## Running the tests
 
 ```bash

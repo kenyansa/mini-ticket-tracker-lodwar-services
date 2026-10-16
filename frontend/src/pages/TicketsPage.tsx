@@ -24,7 +24,7 @@ export function TicketsPage() {
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Mini Ticket Tracker</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Mini Ticket Tracker | Lodwar Services</h1>
         <div className="flex items-center gap-3 text-sm text-gray-600">
           <span>
             {user?.name} <span className="text-gray-400">({user?.role})</span>
