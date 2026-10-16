@@ -5,7 +5,6 @@ import type {
   Status,
   ListTicketsQuery,
   UpdateTicketInput,
-  TicketIdParams,
 } from '../validation/tickets.schemas';
 
 export interface Ticket {
