@@ -13,6 +13,13 @@ export function TicketsPage() {
   const { user, signOut, can } = useAuth();
   const { status, setStatus, setPage, result, stats, loading, error, refetch } = useTickets();
   const [assignees, setAssignees] = useState<UserSummary[]>([]);
+  const [ticketUpdateSuccess, setTicketUpdateSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!ticketUpdateSuccess) return;
+    const timeoutId = window.setTimeout(() => setTicketUpdateSuccess(false), 2000);
+    return () => window.clearTimeout(timeoutId);
+  }, [ticketUpdateSuccess]);
 
   useEffect(() => {
     if (!can('ticket:assign')) return;
@@ -20,6 +27,11 @@ export function TicketsPage() {
       .then(setAssignees)
       .catch(() => setAssignees([]));
   }, [can]);
+
+  function handleTicketChanged() {
+    setTicketUpdateSuccess(true);
+    refetch();
+  }
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6">
@@ -67,11 +79,17 @@ export function TicketsPage() {
 
       <StatusFilter value={status} onChange={setStatus} />
 
+      {ticketUpdateSuccess && (
+        <p role="status" className="status-success">
+          Ticket updated successfully.
+        </p>
+      )}
+
       <TicketList
         tickets={result?.data ?? []}
         assignees={assignees}
         loading={loading}
-        onChanged={refetch}
+        onChanged={handleTicketChanged}
       />
 
       {result && (
