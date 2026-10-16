@@ -18,6 +18,7 @@ export const createTicketSchema = z.strictObject({
 
 export const listTicketsQuerySchema = z.object({
   status: statusSchema.optional(),
+  assignee: z.literal("me").optional(), 
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });
@@ -26,9 +27,10 @@ export const updateTicketSchema = z
   .strictObject({
     status: statusSchema.optional(),
     priority: prioritySchema.optional(),
+    assigneeId: z.number().int().positive().max(2147483647).nullable().optional(),
   })
-  .refine((data) => data.status !== undefined || data.priority !== undefined, {
-    message: "Provide at least one of: status, priority",
+  .refine((data) => data.status !== undefined || data.priority !== undefined || data.assigneeId !== undefined, {
+    message: "Provide at least one of: status, priority, assigneeId",
   });
 
 export const ticketIdParamsSchema = z.object({

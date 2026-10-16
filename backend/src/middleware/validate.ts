@@ -41,7 +41,7 @@ export const validateParams =
         field: issue.path.join('.'),
         message: issue.message,
       }));
-      return next(new HttpError(400, 'Invalid ticket id', details));
+      return next(new HttpError(400, 'Invalid id', details));
     }
     res.locals.params = result.data;
     next();
