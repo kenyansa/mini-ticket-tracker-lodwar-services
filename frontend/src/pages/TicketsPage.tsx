@@ -31,9 +31,26 @@ export function TicketsPage() {
           </span>
           <button
             onClick={signOut}
-            className="rounded border border-gray-300 bg-white px-3 py-1 hover:bg-gray-50"
+            type="button"
+            aria-label="Sign out"
+            title="Sign out"
+            className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
-            Sign out
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="lucide lucide-user-round preview-icon"
+            >
+              <circle cx="12" cy="8" r="5" />
+              <path d="M20 21a8 8 0 0 0-16 0" />
+            </svg>
           </button>
         </div>
       </header>
