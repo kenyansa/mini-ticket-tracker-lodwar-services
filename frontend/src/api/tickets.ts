@@ -6,41 +6,9 @@ import type {
   TicketStats,
   UpdateTicketInput,
 } from '../types/ticket';
+import { request } from './http';
 
 const BASE = '/api/tickets';
-
-export class ApiError extends Error {
-  status: number;
-  details?: unknown;
-
-  constructor(status: number, message: string, details?: unknown) {
-    super(message);
-    this.status = status;
-    this.details = details;
-  }
-}
-
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  });
-
-  if (!res.ok) {
-    let message = `Request failed (${res.status})`;
-    let details: unknown;
-    try {
-      const body = await res.json();
-      message = body?.error?.message ?? message;
-      details = body?.error?.details;
-    } catch {
-      // response had no JSON body, keep the default message
-    }
-    throw new ApiError(res.status, message, details);
-  }
-
-  return res.json() as Promise<T>;
-}
 
 export function listTickets(params: {
   status?: Status;

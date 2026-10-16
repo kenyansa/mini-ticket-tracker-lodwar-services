@@ -8,6 +8,9 @@ export interface Ticket {
   status: Status;
   priority: Priority;
   createdAt: string; // ISO string, JSON has no Date type
+  createdBy: number | null;
+  assigneeId: number | null;
+  assigneeName: string | null;
 }
 
 export interface PaginatedTickets {
@@ -29,4 +32,5 @@ export interface CreateTicketInput {
 export interface UpdateTicketInput {
   status?: Status;
   priority?: Priority;
+  assigneeId?: number | null;
 }
