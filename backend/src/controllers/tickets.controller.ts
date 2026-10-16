@@ -1,24 +1,18 @@
-import type { RequestHandler } from "express";
-import * as ticketsService from "../services/tickets.service";
+import type { RequestHandler } from 'express';
+import * as ticketsService from '../services/tickets.service';
 
 export const create: RequestHandler = async (req, res) => {
-  const ticket = await ticketsService.createTicket(req.body);
-  res.status(201).json(ticket);
+  res.status(201).json(await ticketsService.createTicket(req.body, req.user!));
 };
 
-export const list: RequestHandler = async (_req, res) => {
-  const result = await ticketsService.listTickets(res.locals.query);
-  res.json(result);
+export const list: RequestHandler = async (req, res) => {
+  res.json(await ticketsService.listTickets(res.locals.query, req.user!));
 };
 
 export const update: RequestHandler = async (req, res) => {
-  const ticket = await ticketsService.updateTicket(
-    res.locals.params.id,
-    req.body
-  );
-  res.json(ticket);
+  res.json(await ticketsService.updateTicket(res.locals.params.id, req.body, req.user!));
 };
 
-export const stats: RequestHandler = async (_req, res) => {
-  res.json(await ticketsService.getStats());
+export const stats: RequestHandler = async (req, res) => {
+  res.json(await ticketsService.getStats(req.user!));
 };
